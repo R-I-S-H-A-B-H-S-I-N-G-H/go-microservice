@@ -41,6 +41,7 @@ func setupRoutes(router chi.Router) {
 	router.Route("/wallet", handlers.WalletHandler)
 	router.Route("/s3", handlers.S3Handler)
 	router.Route("/mail", handlers.MailHandler)
+	router.Route("/pixel", handlers.PixelHandler)
 }
 
 func setupEnvVars() {
