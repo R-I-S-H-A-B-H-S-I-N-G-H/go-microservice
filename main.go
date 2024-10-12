@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"rishabhsingh2305/spendings-app/handlers"
+	"rishabhsingh2305/spendings-app/jobs"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
+	"gopkg.in/robfig/cron.v2"
 )
 
 func main() {
@@ -37,6 +39,9 @@ func main() {
 	router.Route("/wallet", handlers.WalletHandler)
 	router.Route("/s3", handlers.S3Handler)
 
+	//jobs
+	startJob()
+
 	PORT := ":" + os.Getenv("PORT")
 	log.Println("Listening on port " + PORT)
 	error := http.ListenAndServe(PORT, router)
@@ -44,4 +49,10 @@ func main() {
 		fmt.Println(error)
 		log.Fatal(error)
 	}
+}
+
+func startJob() {
+	c := cron.New()
+	c.AddFunc("*/10 * * * * *", jobs.PingMicroService)
+	c.Start()
 }
