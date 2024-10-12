@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/handlers"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/jobs"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/error_util"
 	"log"
 	"net/http"
 	"os"
-	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/handlers"
-	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/jobs"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,28 +16,15 @@ import (
 )
 
 func main() {
-	// Load .env file only in local development
-	if os.Getenv("ENV") != "production" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
-	}
-
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://jsserve.pages.dev", "http://localhost:*"}, // Use your allowed origins
-		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
-	})
+	setupEnvVars()
+	c := setupCors()
 
 	router := chi.NewRouter()
 	router.Use(c.Handler)
-	router.Use(middleware.Logger)    // Logs every request
-	router.Use(middleware.Recoverer) // Recovers from panic error
-	router.Use(middleware.Heartbeat("/ping"))
-	router.Route("/wallet", handlers.WalletHandler)
-	router.Route("/s3", handlers.S3Handler)
+	router.Use(middleware.Logger) // Logs every request
+	router.Use(middleware.Recoverer)
+
+	setupRoutes(router)
 
 	//jobs
 	startJob()
@@ -45,10 +32,32 @@ func main() {
 	PORT := ":" + os.Getenv("PORT")
 	log.Println("Listening on port " + PORT)
 	error := http.ListenAndServe(PORT, router)
-	if error != nil {
-		fmt.Println(error)
-		log.Fatal(error)
+	error_util.Handle("Error starting server", error)
+}
+
+func setupRoutes(router chi.Router) {
+	// Recovers from panic error
+	router.Use(middleware.Heartbeat("/ping"))
+	router.Route("/wallet", handlers.WalletHandler)
+	router.Route("/s3", handlers.S3Handler)
+}
+
+func setupEnvVars() {
+	// Load .env file only in local development
+	if os.Getenv("ENV") == "production" {
+		return
 	}
+	err := godotenv.Load()
+	error_util.Handle("Error loading .env file", err)
+}
+
+func setupCors() *cors.Cors {
+	return cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://jsserve.pages.dev", "http://localhost:*"}, // Use your allowed origins
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+	})
 }
 
 func startJob() {
