@@ -53,6 +53,6 @@ func main() {
 
 func startJob() {
 	c := cron.New()
-	c.AddFunc("*/10 * * * * *", jobs.PingMicroService)
+	c.AddFunc("* */5 * * * *", jobs.PingMicroService)
 	c.Start()
 }
