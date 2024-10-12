@@ -7,7 +7,7 @@ import (
 )
 
 func PingMicroService() {
-	url := os.Getenv("PING_URL)")
+	url := os.Getenv("PING_URL")
 
 	response, err := http.Get(url)
 	if err != nil {
