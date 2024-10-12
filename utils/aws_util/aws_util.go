@@ -95,5 +95,5 @@ func getContentType(filename string) string {
 	if contentType, exists := contentTypes[ext]; exists {
 		return contentType
 	}
-	return "application/octet-stream" // Default content type for unknown extensions
+	return "text/" + strings.Split(ext, ".")[1] // Default content type for unknown extensions
 }
