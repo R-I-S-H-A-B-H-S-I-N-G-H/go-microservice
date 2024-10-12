@@ -27,7 +27,7 @@ func main() {
 	setupRoutes(router)
 
 	//jobs
-	startJob()
+	initJobs()
 
 	PORT := ":" + os.Getenv("PORT")
 	log.Println("Listening on port " + PORT)
@@ -40,6 +40,7 @@ func setupRoutes(router chi.Router) {
 	router.Use(middleware.Heartbeat("/ping"))
 	router.Route("/wallet", handlers.WalletHandler)
 	router.Route("/s3", handlers.S3Handler)
+	router.Route("/mail", handlers.MailHandler)
 }
 
 func setupEnvVars() {
@@ -60,8 +61,8 @@ func setupCors() *cors.Cors {
 	})
 }
 
-func startJob() {
+func initJobs() {
 	c := cron.New()
-	c.AddFunc("* */5 * * * *", jobs.PingMicroService)
+	c.AddFunc("@every 5m", jobs.PingMicroService)
 	c.Start()
 }
