@@ -1,6 +1,6 @@
 # Define variables
-IMAGE_NAME := my-go-app
-CONTAINER_NAME := my-go-app-container
+IMAGE_NAME := go-microservice
+CONTAINER_NAME := go-microservice-container
 PORT := 3000
 
 # Targets
