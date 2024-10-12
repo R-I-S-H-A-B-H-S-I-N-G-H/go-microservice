@@ -1,4 +1,4 @@
-module rishabhsingh2305/spendings-app
+module R-I-S-H-A-B-H-S-I-N-G-H/go-microservice
 
 go 1.22.6
 

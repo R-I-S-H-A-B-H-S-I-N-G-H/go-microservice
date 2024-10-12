@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"rishabhsingh2305/spendings-app/handlers"
-	"rishabhsingh2305/spendings-app/jobs"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/handlers"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/jobs"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

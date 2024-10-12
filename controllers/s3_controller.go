@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"net/http"
-	"rishabhsingh2305/spendings-app/services"
-	"rishabhsingh2305/spendings-app/utils/request_util"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/services"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/request_util"
 )
 
 type S3Controller struct {

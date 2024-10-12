@@ -1,6 +1,6 @@
 package services
 
-import "rishabhsingh2305/spendings-app/utils/aws_util"
+import "R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/aws_util"
 
 type S3Service struct {
 }
