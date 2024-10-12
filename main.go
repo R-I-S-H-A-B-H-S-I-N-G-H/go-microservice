@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -21,7 +22,15 @@ func main() {
 		}
 	}
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://jsserve.pages.dev", "http://localhost:*"}, // Use your allowed origins
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+	})
+
 	router := chi.NewRouter()
+	router.Use(c.Handler)
 	router.Use(middleware.Logger)    // Logs every request
 	router.Use(middleware.Recoverer) // Recovers from panic error
 	router.Use(middleware.Heartbeat("/ping"))
