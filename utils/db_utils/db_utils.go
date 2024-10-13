@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +22,7 @@ func GetMongoClient() *mongo.Client {
 }
 
 func GetMongoDb() *mongo.Database {
-	return GetMongoClient().Database("go_microservice")
+	return GetMongoClient().Database(os.Getenv("DB_NAME"))
 }
 
 // CreateOne inserts a single document into the specified collection.
