@@ -20,6 +20,10 @@ func GetMongoClient() *mongo.Client {
 	return mongoClient
 }
 
+func GetMongoDb() *mongo.Database {
+	return GetMongoClient().Database("go_microservice")
+}
+
 // CreateOne inserts a single document into the specified collection.
 func CreateOne(collectionName string, document interface{}) error {
 
@@ -28,7 +32,7 @@ func CreateOne(collectionName string, document interface{}) error {
 	defer cancel()
 
 	// Create a new collection
-	collection := GetMongoClient().Database("test").Collection(collectionName)
+	collection := GetMongoDb().Collection(collectionName)
 
 	// Insert the document
 	_, err := collection.InsertOne(ctx, document)
@@ -46,7 +50,7 @@ func FindOne(collectionName string, filter interface{}) (*mongo.SingleResult, er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	collection := GetMongoClient().Database("test").Collection(collectionName)
+	collection := GetMongoDb().Collection(collectionName)
 
 	result := collection.FindOne(ctx, filter)
 	if result.Err() != nil {
@@ -62,7 +66,7 @@ func UpdateOne(collectionName string, filter interface{}, update interface{}) er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	collection := GetMongoClient().Database("test").Collection(collectionName)
+	collection := GetMongoDb().Collection(collectionName)
 
 	_, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -79,7 +83,7 @@ func DeleteOne(collectionName string, filter interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	collection := GetMongoClient().Database("test").Collection(collectionName)
+	collection := GetMongoDb().Collection(collectionName)
 
 	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
