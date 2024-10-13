@@ -1,6 +1,7 @@
 package main
 
 import (
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/config"
 	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/handlers"
 	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/jobs"
 	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/error_util"
@@ -17,6 +18,7 @@ import (
 
 func main() {
 	setupEnvVars()
+	config.SetupDB()
 	c := setupCors()
 
 	router := chi.NewRouter()
