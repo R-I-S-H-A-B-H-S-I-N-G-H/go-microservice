@@ -64,6 +64,6 @@ func setupCors() *cors.Cors {
 
 func initJobs() {
 	c := cron.New()
-	c.AddFunc("@every 45s", jobs.PingMicroService)
+	c.AddFunc("@every 10m", jobs.PingMicroService)
 	c.Start()
 }
