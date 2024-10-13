@@ -44,6 +44,7 @@ func setupRoutes(router chi.Router) {
 	router.Route("/s3", handlers.S3Handler)
 	router.Route("/mail", handlers.MailHandler)
 	router.Route("/pixel", handlers.PixelHandler)
+	router.Route("/ed", handlers.EDHandler)
 }
 
 func setupEnvVars() {
