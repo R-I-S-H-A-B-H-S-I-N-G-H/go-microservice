@@ -58,7 +58,7 @@ func setupEnvVars() {
 
 func setupCors() *cors.Cors {
 	return cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://jsserve.pages.dev", "http://localhost:*"}, // Use your allowed origins
+		AllowedOrigins:   []string{"https://jsserve.pages.dev", "http://localhost:*", "https://spendings.pages.dev"}, // Use your allowed origins
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},

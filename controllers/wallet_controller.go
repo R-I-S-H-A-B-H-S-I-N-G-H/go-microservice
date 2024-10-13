@@ -63,11 +63,15 @@ func SyncWalletToS3(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")        // Set this to your allowed origin
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")          // Allowed methods
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization") // Allowed headers
+	w.Header().Set("Access-Control-Allow-Credentials", "true")                    // Allow credentials
+
 	var cookie *http.Cookie
 	var err error
 	cookie, err = r.Cookie("user-id")
-
-	log.Default().Println("cookie ::", cookie)
 
 	if err != nil {
 		new_encrypted_cookie, err := encryption_util.GenerateNewCookie()
@@ -77,6 +81,8 @@ func SyncWalletToS3(w http.ResponseWriter, r *http.Request) {
 			Value:    new_encrypted_cookie,
 			Path:     "/",
 			HttpOnly: true,
+			Domain:   "localhost",                              // Correct domain
+			SameSite: http.SameSiteNoneMode,                    // Set SameSite correctly
 			Expires:  time.Now().Add(time.Hour * 24 * 30 * 12), // 12 months
 		}
 	}
