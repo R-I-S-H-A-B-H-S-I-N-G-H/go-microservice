@@ -10,4 +10,5 @@ func WalletHandler(router chi.Router) {
 	router.Get("/", controllers.CreateNewWalletHandler)
 	router.Get("/wallets", controllers.GetWalletListHandler)
 	router.Post("/wallet", controllers.CreateNewWalletFromRequest)
+	router.Post("/sync", controllers.SyncWalletToS3)
 }

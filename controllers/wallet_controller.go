@@ -1,14 +1,17 @@
 package controllers
 
 import (
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/services"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/encryption_util"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/error_util"
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/request_util"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/services"
-	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/request_util"
+	"time"
 )
 
 type WalletController struct {
@@ -26,7 +29,7 @@ func GetWalletListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateNewWalletFromRequest(w http.ResponseWriter, r *http.Request) {
-// Read the request body
+	// Read the request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
@@ -52,4 +55,53 @@ func CreateNewWalletFromRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Respond to the client
 	request_util.ResponseToJson(&w, r, wallet)
+}
+
+func SyncWalletToS3(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Request method not allowed", http.StatusBadRequest)
+		return
+	}
+
+	var cookie *http.Cookie
+	var err error
+	cookie, err = r.Cookie("user-id")
+
+	log.Default().Println("cookie ::", cookie)
+
+	if err != nil {
+		new_encrypted_cookie, err := encryption_util.GenerateNewCookie()
+		error_util.Handle("Failed to generate new cookie", err)
+		cookie = &http.Cookie{
+			Name:     "user-id",
+			Value:    new_encrypted_cookie,
+			Path:     "/",
+			HttpOnly: true,
+			Expires:  time.Now().Add(time.Hour * 24 * 30 * 12), // 12 months
+		}
+	}
+	http.SetCookie(w, cookie)
+
+	user_id, err := encryption_util.DecryptData(cookie.Value)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	// Read the request body as json
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	s3url, err := services.SyncWalletToS3(user_id, string(body))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	request_util.ResponseToJson(&w, r, s3url)
 }

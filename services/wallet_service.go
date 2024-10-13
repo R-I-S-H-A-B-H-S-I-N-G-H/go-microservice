@@ -1,6 +1,7 @@
 package services
 
 import (
+	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/aws_util"
 	"time"
 
 	"github.com/google/uuid"
@@ -100,4 +101,6 @@ func GetNewWallet() *Wallet {
 	return wallet
 }
 
-
+func SyncWalletToS3(userId string, walletPayload string) (string, error) {
+	return aws_util.UploadStrDataToS3(userId+"/wallet.json", walletPayload)
+}
