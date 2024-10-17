@@ -81,8 +81,9 @@ func SyncWalletToS3(w http.ResponseWriter, r *http.Request) {
 			Value:    new_encrypted_cookie,
 			Path:     "/",
 			HttpOnly: true,
-			Domain:   "https://spendings.pages.dev",                              // Correct domain
-			SameSite: http.SameSiteNoneMode,                    // Set SameSite correctly
+			Domain:   "https://spendings.pages.dev", // Correct domain
+			SameSite: http.SameSiteNoneMode,
+			Secure:   true,                                     // Set SameSite correctly
 			Expires:  time.Now().Add(time.Hour * 24 * 30 * 12), // 12 months
 		}
 	}
