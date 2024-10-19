@@ -8,4 +8,6 @@ import (
 
 func PixelHandler(router chi.Router) {
 	router.Get("/{id}", controllers.PixelCaptureController)
+	router.Get("/list", controllers.PixelListController)
+	router.Post("/", controllers.PixelSaveController)
 }

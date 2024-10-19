@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func GetMongoClient() *mongo.Client {
@@ -25,40 +27,39 @@ func GetMongoDb() *mongo.Database {
 	return GetMongoClient().Database(os.Getenv("DB_NAME"))
 }
 
-// CreateOne inserts a single document into the specified collection.
-func CreateOne(collectionName string, document interface{}) error {
-
-	// Create a new context with a timeout
+func CreateOne[T any](collectionName string, document *T) (*T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Create a new collection
 	collection := GetMongoDb().Collection(collectionName)
 
-	// Insert the document
 	_, err := collection.InsertOne(ctx, document)
 	if err != nil {
-		return err // Return the error instead of terminating the program
+		return nil, err
 	}
 
 	log.Println("Document inserted successfully")
-	return nil
+	return document, nil
 }
 
 // FindOne retrieves a single document from the specified collection based on the filter.
-func FindOne(collectionName string, filter interface{}) (*mongo.SingleResult, error) {
+func FindOne[T any](collectionName string, filter interface{}) (*T, error) {
 	// Create a new context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	collection := GetMongoDb().Collection(collectionName)
 
-	result := collection.FindOne(ctx, filter)
-	if result.Err() != nil {
-		return result, result.Err() // Return the error
+	// Initialize a variable of type T to hold the result
+	var result T
+
+	// Find the document
+	err := collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		return nil, err // Return nil and the error
 	}
 
-	return result, nil
+	return &result, nil // Return the pointer to the result
 }
 
 // UpdateOne updates a single document in the specified collection based on the filter.
@@ -93,4 +94,42 @@ func DeleteOne(collectionName string, filter interface{}) error {
 
 	log.Println("Document deleted successfully")
 	return nil
+}
+
+func FindAllWithPagination(collectionName string, filter interface{}, page, limit int, sortField string, ascending bool) ([]bson.M, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	collection := GetMongoDb().Collection(collectionName)
+
+	// Create sort option
+	sortOrder := 1
+	if !ascending {
+		sortOrder = -1
+	}
+
+	// Use bson.M for sort
+	sort := bson.M{sortField: sortOrder}
+
+	// Validate pagination values
+	if page < 1 {
+		page = 1 // Default to page 1
+	}
+	if limit < 1 {
+		limit = 10 // Default limit
+	}
+
+	// Find with sort option and pagination
+	cursor, err := collection.Find(ctx, filter, options.Find().SetSort(sort).SetLimit(int64(limit)).SetSkip(int64((page-1)*limit)))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var results []bson.M
+	if err = cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
