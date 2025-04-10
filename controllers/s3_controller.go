@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"net/http"
 	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/services"
 	"R-I-S-H-A-B-H-S-I-N-G-H/go-microservice/utils/request_util"
+	"net/http"
 )
 
 type S3Controller struct {
@@ -14,6 +14,8 @@ type RequestData struct {
 	FilePath string `json:"filePath"`
 	FileData string `json:"fileData"`
 }
+
+var gitService *services.GitService
 
 func PushDataToS3Controller(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -31,6 +33,13 @@ func PushDataToS3Controller(w http.ResponseWriter, r *http.Request) {
 	// Push data to S3
 	res, err := services.PushToS3(requestData.FilePath, requestData.FileData)
 
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// pushing to git
+	err = gitService.PushToGitHub(requestData.FilePath, requestData.FileData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

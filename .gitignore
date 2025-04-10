@@ -26,3 +26,5 @@ go.work.sum
 
 .vscode
 test.*
+
+my-repo
