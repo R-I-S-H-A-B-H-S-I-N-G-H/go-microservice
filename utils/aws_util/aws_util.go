@@ -19,6 +19,12 @@ func getS3Client() *s3.S3 {
 	awsRegion := os.Getenv("S3_REGION")
 	endpoint := getEndpoint()
 
+
+	fmt.Println("awsaccess", awsAccessKey)
+	fmt.Println("awsSecretKey", awsSecretKey)
+	fmt.Println("awsRegion", awsRegion)
+	fmt.Println("endpoint", endpoint)
+
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(awsAccessKey, awsSecretKey, ""),
 		Endpoint:         aws.String(endpoint),
@@ -48,7 +54,7 @@ func UploadStrDataToS3(objectKey string, str string) (string, error) {
 }
 
 func UploadDataToS3(objectKey string, data []byte) (string, error) {
-
+	fmt.Println("bucket : :", getS3Bucket())
 	svc := getS3Client()
 
 	// Upload the data
