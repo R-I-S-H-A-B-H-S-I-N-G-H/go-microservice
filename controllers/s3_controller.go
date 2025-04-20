@@ -38,12 +38,12 @@ func PushDataToS3Controller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// pushing to git
-	err = gitService.PushToGitHub(requestData.FilePath, requestData.FileData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// // pushing to git
+	// err = gitService.PushToGitHub(requestData.FilePath, requestData.FileData)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	request_util.ResponseToJson(&w, r, res)
 }
